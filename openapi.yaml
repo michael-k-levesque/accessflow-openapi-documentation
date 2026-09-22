@@ -1,0 +1,615 @@
+openapi: 3.1.0
+jsonSchemaDialect: https://json-schema.org/draft/2020-12/schema
+info:
+  title: AccessFlow API
+  version: 1.0.0
+  summary: Submit, review, and track application access requests.
+  description: |
+    AccessFlow is a fictional portfolio API that demonstrates OpenAPI 3.1
+    documentation for an identity-governance workflow. It supports entitlement
+    discovery, access-request submission, request lookup, approval decisions,
+    and requester cancellation.
+
+    This specification is intentionally compact. It demonstrates operation IDs,
+    OAuth 2.0 scopes, idempotent creation, correlation IDs, reusable schemas,
+    examples, pagination, standardized errors, and explicit lifecycle rules.
+  contact:
+    name: Michael K. Levesque
+    url: https://github.com/michael-k-levesque
+  license:
+    name: Portfolio sample - not for production use
+servers:
+  - url: https://api.example.test/accessflow
+    description: Fictional portfolio endpoint
+
+tags:
+  - name: Entitlements
+    description: Discover access that may be requested.
+  - name: Access requests
+    description: Submit and track access requests.
+  - name: Decisions
+    description: Record approval or denial decisions.
+
+security:
+  - oauth2:
+      - access-requests.read
+
+paths:
+  /v1/entitlements:
+    get:
+      tags: [Entitlements]
+      summary: List requestable entitlements
+      description: Returns active entitlements that the caller is allowed to discover.
+      operationId: listEntitlements
+      parameters:
+        - $ref: '#/components/parameters/CorrelationId'
+        - name: applicationId
+          in: query
+          required: false
+          description: Restrict results to one application identifier.
+          schema:
+            type: string
+            minLength: 3
+            maxLength: 64
+          example: finance-portal
+        - name: cursor
+          in: query
+          required: false
+          description: Opaque cursor returned by the previous page.
+          schema:
+            type: string
+            maxLength: 512
+        - name: limit
+          in: query
+          required: false
+          description: Maximum number of results to return.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+      responses:
+        '200':
+          description: Entitlements returned successfully.
+          headers:
+            X-Correlation-ID:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntitlementPage'
+              examples:
+                firstPage:
+                  summary: First page of requestable entitlements
+                  value:
+                    items:
+                      - entitlementId: ent-reporting-read
+                        applicationId: finance-portal
+                        displayName: Reporting - Read Only
+                        description: View published financial reports without editing access.
+                        riskLevel: low
+                        approvalMode: manager
+                        active: true
+                    nextCursor: eyJvZmZzZXQiOjI1fQ
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v1/access-requests:
+    post:
+      tags: [Access requests]
+      summary: Create an access request
+      description: |
+        Submits a new access request for one subject and one entitlement.
+        The `Idempotency-Key` header prevents accidental duplicate creation when
+        a client safely retries the same submission.
+      operationId: createAccessRequest
+      security:
+        - oauth2:
+            - access-requests.write
+      parameters:
+        - $ref: '#/components/parameters/CorrelationId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessRequestCreate'
+            examples:
+              temporaryReportingAccess:
+                summary: Temporary read-only reporting access
+                value:
+                  subjectId: usr-10452
+                  entitlementId: ent-reporting-read
+                  justification: Need read-only reporting access for quarter-end reconciliation.
+                  requestedUntil: '2026-12-31'
+      responses:
+        '201':
+          description: Access request created.
+          headers:
+            Location:
+              description: Canonical URI for the new request.
+              schema:
+                type: string
+                format: uri-reference
+              example: /v1/access-requests/arq-01K5JQ8YDX2X64QAY4R4A9T7DG
+            X-Correlation-ID:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessRequest'
+              examples:
+                pendingManagerApproval:
+                  $ref: '#/components/examples/PendingAccessRequest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: An active request already exists for the same subject and entitlement.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                type: https://api.example.test/problems/duplicate-request
+                title: Duplicate access request
+                status: 409
+                detail: An active request already exists for this subject and entitlement.
+                code: duplicate_request
+                correlationId: 3ae9a6d3-aee6-4f55-b70e-6401cd1d98f6
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v1/access-requests/{requestId}:
+    get:
+      tags: [Access requests]
+      summary: Get an access request
+      description: Returns the current state and decision history for one request.
+      operationId: getAccessRequest
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: Access request returned successfully.
+          headers:
+            X-Correlation-ID:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessRequest'
+              examples:
+                approvedRequest:
+                  $ref: '#/components/examples/ApprovedAccessRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v1/access-requests/{requestId}/decisions:
+    post:
+      tags: [Decisions]
+      summary: Record an access decision
+      description: |
+        Records an approval or denial for the caller's assigned approval step.
+        A decision is rejected if the request is no longer awaiting that step.
+      operationId: createDecision
+      security:
+        - oauth2:
+            - access-decisions.write
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/CorrelationId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DecisionCreate'
+            examples:
+              approve:
+                value:
+                  decision: approved
+                  comment: Manager approval completed after validating quarter-end responsibilities.
+      responses:
+        '200':
+          description: Decision recorded and request state recalculated.
+          headers:
+            X-Correlation-ID:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessRequest'
+              examples:
+                approvedRequest:
+                  $ref: '#/components/examples/ApprovedAccessRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: The request is not currently awaiting a decision from this caller.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v1/access-requests/{requestId}/cancel:
+    post:
+      tags: [Access requests]
+      summary: Cancel a pending access request
+      description: |
+        Cancels a request that is still pending. Approved, denied, expired, or
+        previously cancelled requests cannot be cancelled.
+      operationId: cancelAccessRequest
+      security:
+        - oauth2:
+            - access-requests.write
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: Request cancelled.
+          headers:
+            X-Correlation-ID:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Request cannot be cancelled from its current state.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      description: OAuth 2.0 client-credentials flow for service-to-service access.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.example.test/oauth2/token
+          scopes:
+            access-requests.read: Read entitlement and access-request data.
+            access-requests.write: Create and cancel access requests.
+            access-decisions.write: Approve or deny assigned access requests.
+
+  parameters:
+    RequestId:
+      name: requestId
+      in: path
+      required: true
+      description: Stable identifier assigned to the access request.
+      schema:
+        type: string
+        pattern: '^arq-[A-Z0-9]{26}$'
+      example: arq-01K5JQ8YDX2X64QAY4R4A9T7DG
+    CorrelationId:
+      name: X-Correlation-ID
+      in: header
+      required: false
+      description: |
+        Client-supplied UUID used to correlate logs across systems. If omitted,
+        the service generates one and returns it in the response.
+      schema:
+        type: string
+        format: uuid
+      example: 3ae9a6d3-aee6-4f55-b70e-6401cd1d98f6
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: |
+        Unique value for a logical write operation. Reusing a key with an
+        equivalent request returns the original result; reusing it with a
+        different payload returns HTTP 409.
+      schema:
+        type: string
+        minLength: 16
+        maxLength: 128
+      example: 9bf6c87e-20ab-4f98-af18-fd8375832f6c
+
+  headers:
+    CorrelationId:
+      description: Correlation identifier associated with the request.
+      schema:
+        type: string
+        format: uuid
+      example: 3ae9a6d3-aee6-4f55-b70e-6401cd1d98f6
+
+  schemas:
+    EntitlementPage:
+      type: object
+      additionalProperties: false
+      required: [items, nextCursor]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Entitlement'
+        nextCursor:
+          type: [string, 'null']
+          description: Cursor for the next page, or null when no additional page exists.
+
+    Entitlement:
+      type: object
+      additionalProperties: false
+      required:
+        - entitlementId
+        - applicationId
+        - displayName
+        - description
+        - riskLevel
+        - approvalMode
+        - active
+      properties:
+        entitlementId:
+          type: string
+          pattern: '^ent-[a-z0-9-]+$'
+          example: ent-reporting-read
+        applicationId:
+          type: string
+          example: finance-portal
+        displayName:
+          type: string
+          example: Reporting - Read Only
+        description:
+          type: string
+          example: View published financial reports without editing access.
+        riskLevel:
+          type: string
+          enum: [low, medium, high]
+        approvalMode:
+          type: string
+          enum: [manager, application_owner, manager_and_owner]
+        active:
+          type: boolean
+
+    AccessRequestCreate:
+      type: object
+      additionalProperties: false
+      required: [subjectId, entitlementId, justification]
+      properties:
+        subjectId:
+          type: string
+          pattern: '^usr-[0-9]{5,12}$'
+          description: Stable identifier for the person receiving access.
+          example: usr-10452
+        entitlementId:
+          type: string
+          pattern: '^ent-[a-z0-9-]+$'
+          example: ent-reporting-read
+        justification:
+          type: string
+          minLength: 20
+          maxLength: 1000
+          description: Business reason for the requested access.
+        requestedUntil:
+          type: [string, 'null']
+          format: date
+          description: Requested expiration date. Null means no requester-specified end date.
+
+    AccessRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - requestId
+        - subjectId
+        - entitlementId
+        - justification
+        - requestedUntil
+        - status
+        - submittedAt
+        - submittedBy
+        - decisions
+      properties:
+        requestId:
+          type: string
+          pattern: '^arq-[A-Z0-9]{26}$'
+        subjectId:
+          type: string
+          pattern: '^usr-[0-9]{5,12}$'
+        entitlementId:
+          type: string
+          pattern: '^ent-[a-z0-9-]+$'
+        justification:
+          type: string
+        requestedUntil:
+          type: [string, 'null']
+          format: date
+        status:
+          type: string
+          enum: [pending, approved, denied, cancelled, expired]
+        submittedAt:
+          type: string
+          format: date-time
+        submittedBy:
+          type: string
+          pattern: '^usr-[0-9]{5,12}$'
+        decisions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Decision'
+
+    DecisionCreate:
+      type: object
+      additionalProperties: false
+      required: [decision]
+      properties:
+        decision:
+          type: string
+          enum: [approved, denied]
+        comment:
+          type: [string, 'null']
+          maxLength: 1000
+
+    Decision:
+      type: object
+      additionalProperties: false
+      required: [decision, decidedBy, decidedAt, comment]
+      properties:
+        decision:
+          type: string
+          enum: [approved, denied]
+        decidedBy:
+          type: string
+          pattern: '^usr-[0-9]{5,12}$'
+        decidedAt:
+          type: string
+          format: date-time
+        comment:
+          type: [string, 'null']
+
+    FieldError:
+      type: object
+      additionalProperties: false
+      required: [field, message]
+      properties:
+        field:
+          type: string
+          example: justification
+        message:
+          type: string
+          example: must contain at least 20 characters
+
+    Problem:
+      type: object
+      additionalProperties: false
+      required: [type, title, status, detail, code, correlationId]
+      properties:
+        type:
+          type: string
+          format: uri
+          description: Stable URI identifying the problem class.
+        title:
+          type: string
+        status:
+          type: integer
+          minimum: 400
+          maximum: 599
+        detail:
+          type: string
+        code:
+          type: string
+          pattern: '^[a-z0-9_]+$'
+        correlationId:
+          type: string
+          format: uuid
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldError'
+          default: []
+
+  examples:
+    PendingAccessRequest:
+      summary: Newly submitted request
+      value:
+        requestId: arq-01K5JQ8YDX2X64QAY4R4A9T7DG
+        subjectId: usr-10452
+        entitlementId: ent-reporting-read
+        justification: Need read-only reporting access for quarter-end reconciliation.
+        requestedUntil: '2026-12-31'
+        status: pending
+        submittedAt: '2026-09-22T18:42:31Z'
+        submittedBy: usr-10452
+        decisions: []
+    ApprovedAccessRequest:
+      summary: Request approved by manager
+      value:
+        requestId: arq-01K5JQ8YDX2X64QAY4R4A9T7DG
+        subjectId: usr-10452
+        entitlementId: ent-reporting-read
+        justification: Need read-only reporting access for quarter-end reconciliation.
+        requestedUntil: '2026-12-31'
+        status: approved
+        submittedAt: '2026-09-22T18:42:31Z'
+        submittedBy: usr-10452
+        decisions:
+          - decision: approved
+            decidedBy: usr-20311
+            decidedAt: '2026-09-22T19:03:14Z'
+            comment: Manager approval completed after validating quarter-end responsibilities.
+
+  responses:
+    BadRequest:
+      description: Request syntax or parameters are invalid.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Unauthorized:
+      description: Authentication is missing, invalid, or expired.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Forbidden:
+      description: Authenticated caller does not have the required scope or resource access.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    NotFound:
+      description: Requested resource does not exist or is not visible to the caller.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    ValidationError:
+      description: Request body is syntactically valid but fails one or more business validations.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: https://api.example.test/problems/validation-error
+            title: Validation failed
+            status: 422
+            detail: One or more fields failed validation.
+            code: validation_error
+            correlationId: 3ae9a6d3-aee6-4f55-b70e-6401cd1d98f6
+            errors:
+              - field: justification
+                message: must contain at least 20 characters
+    InternalError:
+      description: Unexpected service error.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
