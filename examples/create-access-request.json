@@ -1,0 +1,6 @@
+{
+  "subjectId": "usr-10452",
+  "entitlementId": "ent-reporting-read",
+  "justification": "Need read-only reporting access for quarter-end reconciliation.",
+  "requestedUntil": "2026-12-31"
+}
