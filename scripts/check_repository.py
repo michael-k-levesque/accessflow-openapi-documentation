@@ -18,6 +18,7 @@ REQUIRED_FILES = {
     "CHANGELOG.md",
     "CONTRIBUTING.md",
     "AI_ASSISTED_DOCUMENTATION_WORKFLOW.md",
+    "DOCUMENTATION_STRATEGY_AND_MEASUREMENT.md",
     "openapi.yaml",
     "requirements.txt",
     "docs/AccessFlow_API_Developer_Guide.pdf",
@@ -27,6 +28,8 @@ REQUIRED_FILES = {
     "scripts/validate_examples.py",
     "scripts/check_repository.py",
     ".github/workflows/validate.yml",
+    ".github/workflows/publish-docs.yml",
+    "site/index.html",
     ".github/pull_request_template.md",
 }
 
