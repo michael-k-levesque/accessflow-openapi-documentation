@@ -29,6 +29,7 @@ Changes to the OpenAPI contract or publishing assets are validated before deploy
 - API lifecycle and state-transition documentation
 - Docs-as-Code structure with branch, pull-request, and CI quality gates
 - Automated validation of internal references, operation IDs, and JSON examples
+- Vale prose linting with repository-specific terminology and word-choice rules
 - Automated GitHub Pages publishing from the authoritative API contract
 - AI-assisted documentation workflow with authoritative-source, human-review, and CI controls
 - Documentation strategy, governance, roadmap, and measurement planning
@@ -45,6 +46,8 @@ Changes to the OpenAPI contract or publishing assets are validated before deploy
 | [`scripts/validate_examples.py`](scripts/validate_examples.py) | Validates OpenAPI structure, `$ref` targets, operation IDs, and examples |
 | [`scripts/check_repository.py`](scripts/check_repository.py) | Checks repository hygiene and lightweight documentation quality |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Branch, review, authoring, and acceptance workflow |
+| [`STYLE_GUIDE.md`](STYLE_GUIDE.md) | Vale-enforced terminology and documentation style rules |
+| [`.vale.ini`](.vale.ini) | Vale configuration for Markdown prose linting |
 | [`.github/workflows/validate.yml`](.github/workflows/validate.yml) | Automated GitHub Actions quality gates |
 | [`.github/workflows/publish-docs.yml`](.github/workflows/publish-docs.yml) | Automated GitHub Pages publishing pipeline |
 | [`site/index.html`](site/index.html) | Browser-rendered API reference entry point |
@@ -135,9 +138,10 @@ Run the same core quality gates locally that GitHub Actions runs on pushes and p
 python -m pip install -r requirements.txt
 python scripts/validate_examples.py
 python scripts/check_repository.py
+vale .
 ```
 
-The OpenAPI validator checks that the YAML parses, the document declares OpenAPI 3.1, internal component references resolve, operation IDs are unique, and the supplied JSON examples validate against their corresponding schemas. The repository checker verifies required files, local Markdown links, basic text hygiene, and exclusion of temporary render output and editable Office source.
+The OpenAPI validator checks that the YAML parses, the document declares OpenAPI 3.1, internal component references resolve, operation IDs are unique, and the supplied JSON examples validate against their corresponding schemas. The repository checker verifies required files, local Markdown links, basic text hygiene, and exclusion of temporary render output and editable Office source. Vale separately enforces project terminology and selected prose rules through the repository's style configuration.
 
 The publishing workflow repeats the quality gates, assembles the API reference site, uploads the Pages artifact, and deploys it to GitHub Pages.
 
