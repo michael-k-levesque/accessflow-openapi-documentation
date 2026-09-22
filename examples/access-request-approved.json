@@ -1,0 +1,18 @@
+{
+  "requestId": "arq-01K5JQ8YDX2X64QAY4R4A9T7DG",
+  "subjectId": "usr-10452",
+  "entitlementId": "ent-reporting-read",
+  "justification": "Need read-only reporting access for quarter-end reconciliation.",
+  "requestedUntil": "2026-12-31",
+  "status": "approved",
+  "submittedAt": "2026-09-22T18:42:31Z",
+  "submittedBy": "usr-10452",
+  "decisions": [
+    {
+      "decision": "approved",
+      "decidedBy": "usr-20311",
+      "decidedAt": "2026-09-22T19:03:14Z",
+      "comment": "Manager approval completed after validating quarter-end responsibilities."
+    }
+  ]
+}
