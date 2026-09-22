@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.0 - 2026-09-22
+
+- Added Vale as an automated documentation-prose quality gate in GitHub Actions.
+- Added repository-specific terminology and word-choice rules plus a documented style guide.
+- Updated the primary validation workflow to current GitHub Actions runtime versions and made error-level Vale findings merge-blocking.
+- Added Vale configuration and style artifacts to the repository's required-file checks.
+
 ## 1.2.0 - 2026-09-22
 
 - Added automated GitHub Pages publication of the browser-rendered OpenAPI reference.
