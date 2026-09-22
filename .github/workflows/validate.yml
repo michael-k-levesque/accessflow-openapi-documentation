@@ -1,0 +1,33 @@
+name: Validate documentation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: OpenAPI and docs quality gates
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install validation dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Validate OpenAPI structure and examples
+        run: python scripts/validate_examples.py
+
+      - name: Check repository and documentation quality
+        run: python scripts/check_repository.py
