@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Lightweight repository and documentation quality checks.
 
-These checks intentionally avoid a heavyweight toolchain so the portfolio can
-run locally and in CI with predictable behavior. They complement, rather than
-replace, a dedicated prose linter or full OpenAPI ruleset in a production repo.
+These checks intentionally stay lightweight so the portfolio can run locally
+and in CI with predictable behavior. They complement Vale prose linting and the
+OpenAPI/example validation performed elsewhere in the repository.
 """
 
 from __future__ import annotations
@@ -19,6 +19,10 @@ REQUIRED_FILES = {
     "CONTRIBUTING.md",
     "AI_ASSISTED_DOCUMENTATION_WORKFLOW.md",
     "DOCUMENTATION_STRATEGY_AND_MEASUREMENT.md",
+    "STYLE_GUIDE.md",
+    ".vale.ini",
+    ".github/styles/AccessFlow/Terminology.yml",
+    ".github/styles/AccessFlow/WordChoice.yml",
     "openapi.yaml",
     "requirements.txt",
     "docs/AccessFlow_API_Developer_Guide.pdf",

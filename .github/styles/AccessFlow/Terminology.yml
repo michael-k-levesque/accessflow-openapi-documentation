@@ -1,0 +1,11 @@
+extends: substitution
+message: "Use '%s' instead of '%s'."
+level: error
+ignorecase: false
+swap:
+  'Open API': 'OpenAPI'
+  'openAPI': 'OpenAPI'
+  'open api': 'OpenAPI'
+  'Github': 'GitHub'
+  'OAuth2': 'OAuth 2.0'
+  'Json Schema': 'JSON Schema'
