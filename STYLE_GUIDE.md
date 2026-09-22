@@ -8,16 +8,16 @@ Use these forms consistently:
 
 | Preferred | Avoid |
 | --- | --- |
-| OpenAPI | Open API, openAPI, open api |
-| GitHub | Github |
-| OAuth 2.0 | OAuth2 |
-| JSON Schema | Json Schema |
+| OpenAPI | `Open API`, `openAPI`, `open api` |
+| GitHub | `Github` |
+| OAuth 2.0 | `OAuth2` |
+| JSON Schema | `Json Schema` |
 
 The terminology rule is maintained in [`.github/styles/AccessFlow/Terminology.yml`](.github/styles/AccessFlow/Terminology.yml).
 
 ## Word choice
 
-Prefer direct verbs where a simpler form is available. The current automated rule replaces forms of **utilize** with **use**.
+Prefer direct verbs where a simpler form is available. The current automated rule replaces forms of `utilize` with `use`.
 
 The word-choice rule is maintained in [`.github/styles/AccessFlow/WordChoice.yml`](.github/styles/AccessFlow/WordChoice.yml).
 
