@@ -19,9 +19,10 @@ From the repository root:
 python -m pip install -r requirements.txt
 python scripts/validate_examples.py
 python scripts/check_repository.py
+vale .
 ```
 
-The first script validates the OpenAPI structure, local references, unique operation IDs, and supplied JSON examples. The second checks repository hygiene and lightweight documentation-quality rules.
+The first script validates the OpenAPI structure, local references, unique operation IDs, and supplied JSON examples. The second checks repository hygiene and lightweight documentation-quality rules. Vale applies the repository's prose, terminology, and word-choice rules to Markdown documentation.
 
 ## Authoring rules
 
@@ -45,5 +46,6 @@ A change is ready to merge when:
 - included JSON examples validate against their schemas;
 - required repository files are present;
 - Markdown and YAML files pass the lightweight repository checks;
+- Markdown documentation passes Vale with no error-level findings;
 - no temporary render output or editable Office source has been committed; and
 - the pull-request description explains what changed and why.
