@@ -1,0 +1,9 @@
+extends: substitution
+message: "Use '%s' instead of '%s'."
+level: error
+ignorecase: true
+swap:
+  '\butilize\b': 'use'
+  '\butilizes\b': 'uses'
+  '\butilized\b': 'used'
+  '\butilizing\b': 'using'
