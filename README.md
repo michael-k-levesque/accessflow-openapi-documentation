@@ -2,9 +2,17 @@
 
 **Michael K. Levesque - Technical Documentation Portfolio**
 
-AccessFlow is a fictional identity-governance API created as a professional portfolio sample. The project demonstrates how I document a compact REST API for implementers, reviewers, and support teams using **OpenAPI 3.1**, reusable JSON Schema components, OAuth 2.0 scopes, examples, error contracts, lifecycle rules, and a Git-based validation workflow.
+AccessFlow is a fictional identity-governance API created as a professional portfolio sample. The project demonstrates how I document a compact REST API for implementers, reviewers, and support teams using **OpenAPI 3.1**, reusable JSON Schema components, OAuth 2.0 scopes, examples, error contracts, lifecycle rules, Git-based review, automated quality gates, and automated publication.
 
 > **Portfolio status:** Original demonstration work. The API, organization, endpoints, identities, and data are fictional. No employer, customer, or proprietary material is included.
+
+## Live API reference
+
+Once GitHub Pages is enabled for this repository, the API reference is published automatically from the source-controlled OpenAPI contract:
+
+**https://michael-k-levesque.github.io/accessflow-openapi-documentation/**
+
+Changes to the OpenAPI contract or publishing assets are validated before deployment through GitHub Actions.
 
 ## What this sample demonstrates
 
@@ -19,8 +27,11 @@ AccessFlow is a fictional identity-governance API created as a professional port
 - Positive and negative example payloads
 - Pagination using opaque cursors
 - API lifecycle and state-transition documentation
-- Docs-as-code structure with branch, pull-request, and CI quality gates
-- Automated validation of internal references, operation IDs, and JSON examples\n- AI-assisted documentation workflow with authoritative-source, human-review, and CI controls
+- Docs-as-Code structure with branch, pull-request, and CI quality gates
+- Automated validation of internal references, operation IDs, and JSON examples
+- Automated GitHub Pages publishing from the authoritative API contract
+- AI-assisted documentation workflow with authoritative-source, human-review, and CI controls
+- Documentation strategy, governance, roadmap, and measurement planning
 
 ## Portfolio files
 
@@ -28,11 +39,15 @@ AccessFlow is a fictional identity-governance API created as a professional port
 | --- | --- |
 | [`openapi.yaml`](openapi.yaml) | Source-of-truth OpenAPI 3.1 contract |
 | [`docs/AccessFlow_API_Developer_Guide.pdf`](docs/AccessFlow_API_Developer_Guide.pdf) | Portfolio-ready developer guide |
+| [`DOCUMENTATION_STRATEGY_AND_MEASUREMENT.md`](DOCUMENTATION_STRATEGY_AND_MEASUREMENT.md) | Documentation strategy, governance, roadmap, and measurement framework |
+| [`AI_ASSISTED_DOCUMENTATION_WORKFLOW.md`](AI_ASSISTED_DOCUMENTATION_WORKFLOW.md) | Controlled AI-assisted authoring, verification, and governance workflow |
 | [`examples/`](examples/) | Request, success-response, and error examples |
 | [`scripts/validate_examples.py`](scripts/validate_examples.py) | Validates OpenAPI structure, `$ref` targets, operation IDs, and examples |
 | [`scripts/check_repository.py`](scripts/check_repository.py) | Checks repository hygiene and lightweight documentation quality |
-| [`AI_ASSISTED_DOCUMENTATION_WORKFLOW.md`](AI_ASSISTED_DOCUMENTATION_WORKFLOW.md) | Controlled AI-assisted authoring, verification, and governance workflow |\n| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Branch, review, authoring, and acceptance workflow |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Branch, review, authoring, and acceptance workflow |
 | [`.github/workflows/validate.yml`](.github/workflows/validate.yml) | Automated GitHub Actions quality gates |
+| [`.github/workflows/publish-docs.yml`](.github/workflows/publish-docs.yml) | Automated GitHub Pages publishing pipeline |
+| [`site/index.html`](site/index.html) | Browser-rendered API reference entry point |
 | [`CHANGELOG.md`](CHANGELOG.md) | Version history |
 
 ## API at a glance
@@ -114,7 +129,7 @@ Errors use `application/problem+json`. A stable machine-readable `code` supports
 
 ## Validation and CI
 
-Run the same core quality gates locally that GitHub Actions runs on pushes to `main` and pull requests:
+Run the same core quality gates locally that GitHub Actions runs on pushes and pull requests:
 
 ```bash
 python -m pip install -r requirements.txt
@@ -124,7 +139,19 @@ python scripts/check_repository.py
 
 The OpenAPI validator checks that the YAML parses, the document declares OpenAPI 3.1, internal component references resolve, operation IDs are unique, and the supplied JSON examples validate against their corresponding schemas. The repository checker verifies required files, local Markdown links, basic text hygiene, and exclusion of temporary render output and editable Office source.
 
-See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the branch, review, and acceptance workflow.\n\n## AI-assisted documentation workflow\n\nThe repository also documents a controlled [AI-assisted documentation workflow](AI_ASSISTED_DOCUMENTATION_WORKFLOW.md). AI can assist with bounded drafting and review tasks, while authoritative source material, technical verification, human editorial ownership, Git review, and CI validation remain the acceptance controls.
+The publishing workflow repeats the quality gates, assembles the API reference site, uploads the Pages artifact, and deploys it to GitHub Pages.
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the branch, review, and acceptance workflow.
+
+## AI-assisted documentation workflow
+
+The repository documents a controlled [AI-assisted documentation workflow](AI_ASSISTED_DOCUMENTATION_WORKFLOW.md). AI can assist with bounded drafting and review tasks, while authoritative source material, technical verification, human editorial ownership, Git review, and CI validation remain the acceptance controls.
+
+## Documentation strategy and measurement
+
+The [documentation strategy and measurement framework](DOCUMENTATION_STRATEGY_AND_MEASUREMENT.md) demonstrates how I would structure a developer-documentation program around audience tasks, information architecture, governance, scalable contribution, roadmap prioritization, quality gates, freshness, support signals, user feedback, and measurable task success.
+
+The framework intentionally does not invent production metrics for this fictional portfolio project.
 
 ## Documentation decisions
 
@@ -134,4 +161,4 @@ The sample also documents business-state conflicts separately from validation er
 
 ## Author contribution
 
-I designed the fictional access-request workflow, information model, resource paths, authentication scopes, request and response contracts, examples, error model, lifecycle guidance, validation approach, CI workflow, AI-assisted documentation control model, and portfolio documentation.
+I designed the fictional access-request workflow, information model, resource paths, authentication scopes, request and response contracts, examples, error model, lifecycle guidance, documentation strategy and measurement framework, validation approach, CI workflow, automated publishing workflow, AI-assisted documentation control model, and portfolio documentation.
