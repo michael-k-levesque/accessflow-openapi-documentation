@@ -1,0 +1,14 @@
+{
+  "type": "https://api.example.test/problems/validation-error",
+  "title": "Validation failed",
+  "status": 422,
+  "detail": "One or more fields failed validation.",
+  "code": "validation_error",
+  "correlationId": "3ae9a6d3-aee6-4f55-b70e-6401cd1d98f6",
+  "errors": [
+    {
+      "field": "justification",
+      "message": "must contain at least 20 characters"
+    }
+  ]
+}
