@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_FILES = {
     "README.md",
     "CHANGELOG.md",
-    "CONTRIBUTING.md",
+    "CONTRIBUTING.md",\n    "AI_ASSISTED_DOCUMENTATION_WORKFLOW.md",
     "openapi.yaml",
     "requirements.txt",
     "docs/AccessFlow_API_Developer_Guide.pdf",
