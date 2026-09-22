@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local build and render output
+_render/
+_render2/
+_pdf_verify/
+build/
+dist/
+*.tmp
+*.log
+
+# Editable office sources are intentionally excluded from the public repo
+*.docx
