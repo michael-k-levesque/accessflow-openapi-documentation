@@ -17,6 +17,7 @@ REQUIRED_FILES = {
     "README.md",
     "CHANGELOG.md",
     "CONTRIBUTING.md",
+    "AI_ASSISTED_DOCUMENTATION_WORKFLOW.md",
     "openapi.yaml",
     "requirements.txt",
     "docs/AccessFlow_API_Developer_Guide.pdf",

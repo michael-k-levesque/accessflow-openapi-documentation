@@ -20,7 +20,7 @@ AccessFlow is a fictional identity-governance API created as a professional port
 - Pagination using opaque cursors
 - API lifecycle and state-transition documentation
 - Docs-as-code structure with branch, pull-request, and CI quality gates
-- Automated validation of internal references, operation IDs, and JSON examples
+- Automated validation of internal references, operation IDs, and JSON examples\n- AI-assisted documentation workflow with authoritative-source, human-review, and CI controls
 
 ## Portfolio files
 
@@ -31,7 +31,7 @@ AccessFlow is a fictional identity-governance API created as a professional port
 | [`examples/`](examples/) | Request, success-response, and error examples |
 | [`scripts/validate_examples.py`](scripts/validate_examples.py) | Validates OpenAPI structure, `$ref` targets, operation IDs, and examples |
 | [`scripts/check_repository.py`](scripts/check_repository.py) | Checks repository hygiene and lightweight documentation quality |
-| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Branch, review, authoring, and acceptance workflow |
+| [`AI_ASSISTED_DOCUMENTATION_WORKFLOW.md`](AI_ASSISTED_DOCUMENTATION_WORKFLOW.md) | Controlled AI-assisted authoring, verification, and governance workflow |\n| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Branch, review, authoring, and acceptance workflow |
 | [`.github/workflows/validate.yml`](.github/workflows/validate.yml) | Automated GitHub Actions quality gates |
 | [`CHANGELOG.md`](CHANGELOG.md) | Version history |
 
@@ -124,7 +124,7 @@ python scripts/check_repository.py
 
 The OpenAPI validator checks that the YAML parses, the document declares OpenAPI 3.1, internal component references resolve, operation IDs are unique, and the supplied JSON examples validate against their corresponding schemas. The repository checker verifies required files, local Markdown links, basic text hygiene, and exclusion of temporary render output and editable Office source.
 
-See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the branch, review, and acceptance workflow.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the branch, review, and acceptance workflow.\n\n## AI-assisted documentation workflow\n\nThe repository also documents a controlled [AI-assisted documentation workflow](AI_ASSISTED_DOCUMENTATION_WORKFLOW.md). AI can assist with bounded drafting and review tasks, while authoritative source material, technical verification, human editorial ownership, Git review, and CI validation remain the acceptance controls.
 
 ## Documentation decisions
 
@@ -134,4 +134,4 @@ The sample also documents business-state conflicts separately from validation er
 
 ## Author contribution
 
-I designed the fictional access-request workflow, information model, resource paths, authentication scopes, request and response contracts, examples, error model, lifecycle guidance, validation approach, CI workflow, and portfolio documentation.
+I designed the fictional access-request workflow, information model, resource paths, authentication scopes, request and response contracts, examples, error model, lifecycle guidance, validation approach, CI workflow, AI-assisted documentation control model, and portfolio documentation.
